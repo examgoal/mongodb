@@ -1,0 +1,23 @@
+{
+  "name": "@examgoal/mongodb",
+  "version": "1.0.1",
+  "description": "MongoDB Session Management Helper for ExpressJS or any Node JS Projects",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/examgoal/mongodb.git"
+  },
+  "author": "Arpan Roy",
+  "license": "MIT",
+  "private": false,
+  "bugs": {
+    "url": "https://github.com/examgoal/mongodb/issues"
+  },
+  "homepage": "https://github.com/examgoal/mongodb#readme",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "mongodb": "^3.2.3"
+  }
+}
