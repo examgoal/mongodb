@@ -1,4 +1,4 @@
-import {MongoClientOptions, MongoClient, Db} from 'mongodb'
+import {ClientSession, Db, MongoClient, MongoClientOptions} from 'mongodb'
 
 const instances: { [key: string]: MongodbClient } = {};
 
@@ -39,15 +39,24 @@ class MongodbClient{
                 }
                 if(this.configuration.logEnabled){
 
-                    console.log((c.name || '[DEFAULT]')+" App's MongoDB Connected");
+                    console.log(`${this.name} App's MongoDB Connected`);
 
                 }
 
                 this.mongoClient = res;
 
-                return resolve(instances[c.name || '[DEFAULT]']);
+                return resolve(instances[this.name]);
             })
         });
+    }
+
+    createSession(): ClientSession {
+        if(!this.mongoClient){
+
+            throw new Error(`${this.name} Can't create session if client is not connected`);
+
+        }
+        return this.mongoClient.startSession();
     }
 
     get db(): Db | undefined{
@@ -62,6 +71,10 @@ class MongodbClient{
         return this.mongoClient;
     }
 
+    get name(){
+        return this.configuration.name || '[DEFAULT]';
+    }
+
     static async initializeApp(config: ConfigOptions){
 
         try {
@@ -72,7 +85,7 @@ class MongodbClient{
 
         }catch (e) {
 
-            throw new Error((config.name || '[DEFAULT]')+' MongoDB App\'s Error Occurred on first initialization '+e.toString());
+            throw new Error(`${this.name} MongoDB App\'s Error Occurred on first initialization ${e.toString()}`);
 
         }
     }
