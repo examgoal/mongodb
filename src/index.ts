@@ -1,24 +1,19 @@
-import {ClientSession, Db, MongoClient, MongoClientOptions} from 'mongodb'
+import {ClientSession, Db, MongoClient} from 'mongodb'
+import {ConfigOptions} from "./lib/options";
 
 const instances: { [key: string]: MongodbClient } = {};
-
-export interface ConfigOptions {
-    uri: string,
-    db: string,
-    mongodbOptions?: MongoClientOptions,
-    name?: string,
-    logEnabled: boolean
-}
 
 class MongodbClient{
 
     private readonly configuration: ConfigOptions;
 
-    private mongoClient?: MongoClient;
+    private readonly mongoClient: MongoClient;
 
     constructor(config: ConfigOptions){
 
         this.configuration = config;
+
+        this.mongoClient = new MongoClient(config.uri, {...(config.mongodbOptions || {}), useNewUrlParser: true});
 
         instances[config.name || '[DEFAULT]'] = this;
     }
@@ -26,11 +21,7 @@ class MongodbClient{
     connect() : Promise<MongodbClient>{
         return new Promise(async (resolve, reject) => {
 
-            let c = this.configuration;
-
-            let client = new MongoClient(c.uri, {...(c.mongodbOptions || {}), useNewUrlParser: true});
-
-            client.connect((err, res)=>{
+            this.mongoClient.connect((err)=>{
 
                 if(err){
 
@@ -43,15 +34,13 @@ class MongodbClient{
 
                 }
 
-                this.mongoClient = res;
-
                 return resolve(instances[this.name]);
             })
         });
     }
 
     createSession(): ClientSession {
-        if(!this.mongoClient){
+        if(!this.isConnected){
 
             throw new Error(`${this.name} Can't create session if client is not connected`);
 
@@ -59,15 +48,15 @@ class MongodbClient{
         return this.mongoClient.startSession();
     }
 
-    get db(): Db | undefined{
-        return this.mongoClient ? this.mongoClient.db(this.configuration.db) : undefined;
+    get db(): Db {
+        return this.mongoClient.db(this.configuration.db);
     }
 
     get isConnected(): boolean{
-        return this.mongoClient != null;
+        return this.mongoClient.isConnected();
     }
 
-    get client() : MongoClient | undefined {
+    get client() : MongoClient{
         return this.mongoClient;
     }
 
@@ -100,6 +89,6 @@ class MongodbClient{
     }
 }
 
-export default MongodbClient;
+export = MongodbClient;
 
 

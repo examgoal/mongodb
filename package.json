@@ -1,9 +1,8 @@
 {
   "name": "@examgoal/mongodb",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "MongoDB Session Management Helper for ExpressJS or any Node JS Projects",
   "main": "./dist/index.js",
-  "types": "./src/index.ts",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/examgoal/mongodb.git"
@@ -19,7 +18,7 @@
   },
   "homepage": "https://github.com/examgoal/mongodb#readme",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "node test/index.js",
     "build": "tsc"
   },
   "dependencies": {
@@ -29,5 +28,8 @@
     "@types/mongodb": "^3.3.1",
     "@types/node": "^12.7.2",
     "typescript": "^3.6.2"
-  }
+  },
+  "files": [
+    "dist/**/*"
+  ]
 }
