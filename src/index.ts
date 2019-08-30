@@ -15,7 +15,6 @@ class MongodbClient{
 
         this.mongoClient = new MongoClient(config.uri, {...(config.mongodbOptions || {}), useNewUrlParser: true});
 
-        instances[config.name || '[DEFAULT]'] = this;
     }
 
     connect() : Promise<MongodbClient>{
@@ -64,19 +63,18 @@ class MongodbClient{
         return this.configuration.name || '[DEFAULT]';
     }
 
-    static async initializeApp(config: ConfigOptions){
+    static initializeApp(config: ConfigOptions){
 
-        try {
+        let a = new MongodbClient(config);
 
-            let a = new MongodbClient(config);
+        instances[config.name || '[DEFAULT]'] = a;
 
-            await a.connect();
+        a.connect().catch(err=> {
 
-        }catch (e) {
+            throw new Error(`${a.name} MongoDB App\'s Error Occurred on first initialization ${err.toString()}`);
 
-            throw new Error(`${this.name} MongoDB App\'s Error Occurred on first initialization ${e.toString()}`);
+        });
 
-        }
     }
 
     static getInstance(name: string) : MongodbClient {
