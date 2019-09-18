@@ -1,3 +1,3 @@
-const Mongodb = require("../dist/index");
+const Mongodb = require("../dist");
 
 console.log(Mongodb);

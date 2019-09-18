@@ -18,7 +18,7 @@ class MongodbClient{
     }
 
     connect() : Promise<MongodbClient>{
-        return new Promise(async (resolve, reject) => {
+        return new Promise((resolve, reject) => {
 
             this.mongoClient.connect((err)=>{
 
