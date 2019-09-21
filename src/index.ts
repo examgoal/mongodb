@@ -71,19 +71,19 @@ class MongodbClient{
 
         a.connect().catch(err=> {
 
-            throw new Error(`${a.name} MongoDB App\'s Error Occurred on first initialization ${err.toString()}`);
+            throw new Error(`${a.name} MongoDB App\'s Error Occurred on first initialization : Error = ${err.toString()}`);
 
         });
 
     }
 
-    static getInstance(name: string) : MongodbClient {
+    static getInstance(name?: string) : MongodbClient {
         if(!instances.hasOwnProperty(name || '[DEFAULT]')){
 
             throw new Error((name || '[DEFAULT]')+" MongoDB App is not found");
 
         }
-        return instances[name];
+        return instances[name || '[DEFAULT]'];
     }
 }
 
