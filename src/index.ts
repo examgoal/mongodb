@@ -13,29 +13,8 @@ class MongodbClient{
 
         this.configuration = config;
 
-        this.mongoClient = new MongoClient(config.uri, {...(config.mongodbOptions || {}), useNewUrlParser: true});
+        this.mongoClient = new MongoClient(config.uri, {...(config.mongodbOptions || {}), numberOfRetries: Number.MAX_VALUE, useNewUrlParser: true, useUnifiedTopology: true});
 
-    }
-
-    connect() : Promise<MongodbClient>{
-        return new Promise((resolve, reject) => {
-
-            this.mongoClient.connect((err)=>{
-
-                if(err){
-
-                    return reject(err);
-
-                }
-                if(this.configuration.logEnabled){
-
-                    console.log(`${this.name} App's MongoDB Connected`);
-
-                }
-
-                return resolve(instances[this.name]);
-            })
-        });
     }
 
     createSession(): ClientSession {
@@ -45,6 +24,17 @@ class MongodbClient{
 
         }
         return this.mongoClient.startSession();
+    }
+
+    getDb(name?: string): Promise<Db>{
+       return new Promise((resolve, reject) => {
+             if(this.isConnected){
+                 return resolve(this.mongoClient.db(name || this.configuration.db));
+             }
+             this.mongoClient.connect()
+                 .then(res=> resolve(res.db(name || this.configuration.db)))
+                 .catch(reject);
+       });
     }
 
     get db(): Db {
@@ -65,15 +55,7 @@ class MongodbClient{
 
     static initializeApp(config: ConfigOptions){
 
-        let a = new MongodbClient(config);
-
-        instances[config.name || '[DEFAULT]'] = a;
-
-        a.connect().catch(err=> {
-
-            throw new Error(`${a.name} MongoDB App\'s Error Occurred on first initialization : Error = ${err.toString()}`);
-
-        });
+        instances[config.name || '[DEFAULT]'] = new MongodbClient(config);
 
     }
 
