@@ -32,7 +32,12 @@ class MongodbClient{
                  return resolve(this.mongoClient.db(name || this.configuration.db));
              }
              this.mongoClient.connect()
-                 .then(res=> resolve(res.db(name || this.configuration.db)))
+                 .then(res=>{
+                     if(this.configuration.logEnabled){
+                         console.log(`${this.name} Mongodb Connection Established`);
+                     }
+                     return resolve(res.db(name || this.configuration.db));
+                 })
                  .catch(reject);
        });
     }
