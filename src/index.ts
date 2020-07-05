@@ -7,17 +7,23 @@ class MongodbClient {
 
     private readonly configuration: ConfigOptions;
 
-    private readonly mongoClient: MongoClient;
+    private mongoClient: MongoClient;
+
+    private isConnected: boolean = false;
 
     constructor(config: ConfigOptions) {
-
         this.configuration = config;
-
         this.mongoClient = new MongoClient(config.uri, config.mongodbOptions || {});
-
+        this.mongoClient.on("serverClosed", this.resetClient);
     }
 
-    // If you are not using unifiedTopology use this line to connect
+    private resetClient() {
+        this.mongoClient.removeListener("serverClosed", this.resetClient);
+        this.mongoClient = new MongoClient(this.configuration.uri, this.configuration.mongodbOptions || {});
+        this.mongoClient.on("serverClosed", this.resetClient);
+        this.isConnected = false;
+    }
+
     getDb(name?: string): Promise<Db> {
         return new Promise((resolve, reject) => {
             if (this.isConnected) {
@@ -28,18 +34,14 @@ class MongodbClient {
                     if (this.configuration.logEnabled) {
                         console.log(`${this.name} Mongodb Connection Established`);
                     }
+                    this.isConnected = true;
                     return resolve(res.db(name || this.configuration.db));
                 })
-                .catch(reject);
+                .catch(err => {
+                    this.isConnected = false;
+                    reject(err);
+                });
         });
-    }
-
-    get db(): Db {
-        return this.mongoClient.db(this.configuration.db);
-    }
-
-    get isConnected(): boolean {
-        return this.mongoClient.isConnected();
     }
 
     get client(): MongoClient {
