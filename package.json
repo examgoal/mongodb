@@ -1,6 +1,6 @@
 {
   "name": "@examgoal/mongodb",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "MongoDB Session Management Helper for ExpressJS or any Node JS Projects",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
