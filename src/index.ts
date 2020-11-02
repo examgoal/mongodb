@@ -20,9 +20,7 @@ class MongodbClient {
     }
 
     private resetClient() {
-        if (this.mongoClient) {
-            this.mongoClient.removeAllListeners("serverClosed");
-        }
+        this.mongoClient.removeAllListeners("serverClosed");
         this.mongoClient = new MongoClient(this.configuration.uri, this.configuration.mongodbOptions || {});
         this.mongoClient.on("serverClosed", this.resetClient);
         this.isConnected = false;
