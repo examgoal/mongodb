@@ -51,8 +51,9 @@ class MongodbClient {
     }
 
     async close(force?: boolean) {
-        this.isConnected = false
-        await this.mongoClient.close(force)
+        this.isConnected = false;
+        this.connectPromise = null;
+        await this.mongoClient.close(force);
     }
 
     get client(): MongoClient {
