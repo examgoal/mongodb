@@ -1,6 +1,6 @@
 const Mongodb = require("mongodb").MongoClient;
 
-const client = new Mongodb(process.env.MONGODB_URI, {
+const client = new Mongodb(process.env.MONGODB_URI || 'mongodb://localhost:27017/examgoal', {
     useUnifiedTopology: true,
     useNewUrlParser: true,
     socketTimeoutMS: 1000,
@@ -13,6 +13,7 @@ const clientConnected = () => {
 
 client.on('serverClosed', async function (event) {
     console.log('received serverClosed');
+    client.removeListener("serverClosed", () => {})
     clientConnected();
     console.log(event);
 });
@@ -24,6 +25,8 @@ client.on('serverClosed', async function (event) {
     await client.connect();
 
     const db = client.db("examgoal");
+
+    await client.close(true)
 
     const f = () => {
         clientConnected();
