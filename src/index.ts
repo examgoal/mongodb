@@ -16,13 +16,13 @@ class MongodbClient {
     constructor(config: ConfigOptions) {
         this.configuration = config;
         this.mongoClient = new MongoClient(config.uri, config.mongodbOptions || {});
-        this.mongoClient.on("serverClosed", this.resetClient);
+        this.mongoClient.on("serverClosed", () => { this.resetClient() });
     }
 
     private resetClient() {
         this.mongoClient.removeAllListeners("serverClosed");
         this.mongoClient = new MongoClient(this.configuration.uri, this.configuration.mongodbOptions || {});
-        this.mongoClient.on("serverClosed", this.resetClient);
+        this.mongoClient.on("serverClosed", () => { this.resetClient() });
         this.isConnected = false;
         this.connectPromise = null;
     }
